@@ -1,0 +1,7 @@
+package command
+
+const (
+	REGISTER_ROOM_REQUEST  = 0
+	REGISTER_ROOM_RESPONSE = 1
+	ADD_ROOM_REQUEST
+)
