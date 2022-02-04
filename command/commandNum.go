@@ -1,5 +1,7 @@
 package command
 
+import "strconv"
+
 const (
 	REGISTER_ROOM_REQUEST  = 0
 	REGISTER_ROOM_RESPONSE = 1
@@ -13,3 +15,12 @@ const (
 	SUCCESS_RESPONSE = 6
 	FAIL_RESPONSE    = 7
 )
+
+func TypeSelector(buffer string) int {
+	commmand_type, err := strconv.Atoi(buffer[:2])
+	if err != nil {
+		return -1
+	} else {
+		return commmand_type
+	}
+}

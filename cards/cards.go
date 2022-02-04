@@ -18,6 +18,14 @@ const (
 	Card_joker_big   = 15
 )
 
+const (
+	Heart    = 0 /* 红桃 */
+	Club     = 1 /* 梅花 */
+	Dianmond = 3 /* 方块 */
+	Spade    = 4 /* 黑桃 */
+)
+
 type Card struct {
 	CardNum int `json:"CardNum"`
+	Decor   int `json:"Decor"`
 }
