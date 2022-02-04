@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"fmt"
 	"poker_server/cards"
 )
 
@@ -31,14 +32,25 @@ type Dealing struct {
 	Cards []cards.Card `json:"Cards"`
 }
 
-func RegisterRoomResponseSerialize(roomNun int) string {
-	buffer, _ := json.Marshal(RegisterRoomResponse{RoomNum: roomNun})
-	return string(buffer)
+func commandTypeToString(commandType int) string {
+	var commandStr string
+
+	if commandType < 10 {
+		commandStr = fmt.Sprintf("0%d", commandType)
+	} else {
+		commandStr = fmt.Sprintf("%d", commandType)
+	}
+	return commandStr
 }
 
-func ResponseSerialize(res int) string {
+func RegisterRoomResponseSerialize(roomNun int) string {
+	buffer, _ := json.Marshal(RegisterRoomResponse{RoomNum: roomNun})
+	return commandTypeToString(REGISTER_ROOM_RESPONSE) + string(buffer)
+}
+
+func ResponseSerialize(res int, responseNum int) string {
 	buffer, _ := json.Marshal(Response{StatusCode: res})
-	return string(buffer)
+	return commandTypeToString(responseNum) + string(buffer)
 }
 
 func AddRoomRequestDeSerialize(str string) int {
@@ -48,4 +60,25 @@ func AddRoomRequestDeSerialize(str string) int {
 		return -1
 	}
 	return req.RoomNum
+}
+
+func PutCardSerialize() string {
+	return commandTypeToString(COMMAND_PUT_CARD)
+}
+
+func DealCardsSerialize(cs []cards.Card) string {
+	dealing := Dealing{
+		Cards: cs,
+	}
+	buffer, _ := json.Marshal(dealing)
+	return commandTypeToString(DEAL_CARD_COMMAND) + string(buffer)
+}
+
+func CardsDeSerialize(str string) []cards.Card {
+	var dealing Dealing
+	err := json.Unmarshal([]byte(str), &dealing)
+	if err != nil {
+		return nil
+	}
+	return dealing.Cards
 }

@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 	statemachine "poker_server/stateMachine"
 
@@ -15,18 +14,27 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
-func doWork(c *gin.Context) {
+func buildroom(c *gin.Context) {
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Println(1, err)
 		return
 	}
 	defer ws.Close()
-	statemachine.DoWork(ws)
+	statemachine.BuildRoom(ws)
+}
+
+func addroom(c *gin.Context) {
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		return
+	}
+	defer ws.Close()
+	statemachine.AddRoom(ws)
 }
 
 func Run() {
 	r := gin.Default()
-	r.GET("/ping", doWork)
-	r.Run(":12345")
+	r.GET("/buildroom", buildroom)
+	r.GET("/addroom", addroom)
+	r.Run(":12346")
 }

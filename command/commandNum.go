@@ -14,6 +14,9 @@ const (
 
 	SUCCESS_RESPONSE = 6
 	FAIL_RESPONSE    = 7
+
+	COMMAND_PUT_CARD  = 8 /* 出牌指令 */
+	DEAL_CARD_COMMAND = 9 /* 服务端发牌 */
 )
 
 func TypeSelector(buffer string) int {

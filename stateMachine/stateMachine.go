@@ -1,6 +1,7 @@
 package statemachine
 
 import (
+	"log"
 	"poker_server/client"
 	"poker_server/command"
 	"poker_server/tools"
@@ -27,24 +28,43 @@ func BuildRoom(ws *websocket.Conn) {
 	stopChannel := storeStopChannel(roomNum)
 
 	<-startChannel
-	for {
 
-		buffer = <-c.ChannelOut
-		sendMessge(ws, buffer)
+	go func() {
+		for {
+			b := <-c.ChannelOut
+			sendMessge(ws, b)
 
-		buffer = getMessage(ws)
-		c.ChannelIn <- buffer
-
-		flag := false
-		select {
-		case <-stopChannel:
-			flag = true
-		default:
+			flag := false
+			select {
+			case <-stopChannel:
+				flag = true
+			default:
+			}
+			if flag {
+				break
+			}
 		}
-		if flag {
-			break
+	}()
+
+	go func() {
+		for {
+			b := getMessage(ws)
+			c.ChannelIn <- b
+
+			flag := false
+			select {
+			case <-stopChannel:
+				flag = true
+			default:
+			}
+			if flag {
+				break
+			}
 		}
-	}
+	}()
+
+	<-stopChannel
+	log.Println("end...")
 }
 
 func AddRoom(ws *websocket.Conn) {
@@ -70,27 +90,46 @@ func AddRoom(ws *websocket.Conn) {
 		return
 	}
 	pair := getClients(roomNum)
+	/* start bussiness goroutine */
 	go Bussiness(pair[0], pair[1])
 	channel <- struct{}{}
 
-	for {
+	go func() {
+		for {
+			b := <-c.ChannelOut
+			sendMessge(ws, b)
 
-		buffer = <-c.ChannelOut
-		sendMessge(ws, buffer)
-
-		buffer = getMessage(ws)
-		c.ChannelIn <- buffer
-
-		flag := false
-		select {
-		case <-stopChannel:
-			flag = true
-		default:
+			flag := false
+			select {
+			case <-stopChannel:
+				flag = true
+			default:
+			}
+			if flag {
+				break
+			}
 		}
-		if flag {
-			break
+	}()
+
+	go func() {
+		for {
+			b := getMessage(ws)
+			c.ChannelIn <- b
+
+			flag := false
+			select {
+			case <-stopChannel:
+				flag = true
+			default:
+			}
+			if flag {
+				break
+			}
 		}
-	}
+	}()
+
+	<-stopChannel
+	log.Println("end...")
 }
 
 func ResponseRegisterRoom(ws *websocket.Conn, room *int) *client.Client {
@@ -113,14 +152,14 @@ func ResponseAddRoom(ws *websocket.Conn, str string, outRomm *int) *client.Clien
 		pair, _ := obj.([2]*client.Client)
 		pair[1] = client.NewClient()
 		clients.Store(roomNum, pair)
-		if sendMessge(ws, command.ResponseSerialize(command.RESULT_OK)) != nil {
+		if sendMessge(ws, command.ResponseSerialize(command.RESULT_OK, command.ADD_ROOM_RESPONSE)) != nil {
 			return nil
 		} else {
 			*outRomm = roomNum
 			return pair[1]
 		}
 	} else {
-		sendMessge(ws, command.ResponseSerialize(command.RESULT_NOK))
+		sendMessge(ws, command.ResponseSerialize(command.RESULT_NOK, command.ADD_ROOM_RESPONSE))
 		return nil
 	}
 }

@@ -67,7 +67,7 @@ func pTestChannel03(t *testing.T) {
 	fmt.Println("main end....")
 }
 
-func TestChannel04(t *testing.T) {
+func oTestChannel04(t *testing.T) {
 	c := make(chan struct{})
 
 	go func() {
@@ -90,6 +90,45 @@ func TestChannel04(t *testing.T) {
 
 	time.Sleep(time.Second)
 	c <- struct{}{}
+
+	time.Sleep(time.Second)
+
+	fmt.Println("main end...")
+}
+
+func TestChannel05(t *testing.T) {
+	c := make(chan struct{})
+	c2 := make(chan struct{})
+
+	f := func() struct{} {
+
+		fmt.Println("f1 start")
+		time.Sleep(time.Second * 3)
+		fmt.Println("f1 after sleep")
+		return struct{}{}
+	}
+
+	go func() {
+		for {
+			flag := false
+			select {
+			case c <- f():
+				fmt.Println("c need")
+				flag = true
+			case <-c2:
+				fmt.Println("c2 get")
+				flag = true
+			default:
+			}
+			if flag {
+				break
+			}
+		}
+		fmt.Println("goroutine end...")
+	}()
+
+	time.Sleep(time.Second * 1)
+	c2 <- struct{}{}
 
 	time.Sleep(time.Second)
 

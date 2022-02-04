@@ -56,4 +56,12 @@ func TestCommand(t *testing.T) {
 
 	fmt.Println("-----------------------")
 
+	fmt.Println("rewrq" + "ooooo")
+
+}
+
+func TestDealingCards(t *testing.T) {
+	c1, _ := cards.GenerateCard()
+
+	fmt.Println(command.DealCardsSerialize(c1))
 }
