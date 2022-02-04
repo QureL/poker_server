@@ -1,13 +1,17 @@
 package client
 
-import "poker_server/cards"
+const (
+	CHANNEL_SIZE = 1
+)
 
 type Client struct {
-	Channel chan []cards.Card
+	ChannelIn  chan string
+	ChannelOut chan string
 }
 
 func NewClient() *Client {
 	return &Client{
-		Channel: make(chan []cards.Card),
+		ChannelIn:  make(chan string, CHANNEL_SIZE),
+		ChannelOut: make(chan string, CHANNEL_SIZE),
 	}
 }
