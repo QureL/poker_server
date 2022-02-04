@@ -54,4 +54,6 @@ func TestCommand(t *testing.T) {
 		fmt.Print(rand.Intn(54), " ")
 	}
 
+	fmt.Println("-----------------------")
+
 }

@@ -19,8 +19,8 @@ const (
 )
 
 const (
-	Heart    = 0 /* 红桃 */
-	Club     = 1 /* 梅花 */
+	Heart    = 1 /* 红桃 */
+	Club     = 2 /* 梅花 */
 	Dianmond = 3 /* 方块 */
 	Spade    = 4 /* 黑桃 */
 )
@@ -28,4 +28,28 @@ const (
 type Card struct {
 	CardNum int `json:"CardNum"`
 	Decor   int `json:"Decor"`
+}
+
+func NewCardFromInt(num int) Card {
+	/*
+		num = cardnum * decor
+	*/
+	if num == 53 {
+		return Card{
+			CardNum: Card_joker_small,
+		}
+	}
+	if num == 54 {
+		return Card{
+			CardNum: Card_joker_big,
+		}
+	}
+
+	cardnum := num/4 + 1
+	decor := num%4 + 1
+	return Card{
+		CardNum: cardnum,
+		Decor:   decor,
+	}
+
 }
