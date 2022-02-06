@@ -1,11 +1,13 @@
 package statemachine
 
 import (
+	"log"
 	"math/rand"
 	"poker_server/cards"
 	"poker_server/client"
 	"poker_server/command"
 	"poker_server/logic"
+	"time"
 )
 
 func Bussiness(c1, c2 *client.Client) {
@@ -14,36 +16,62 @@ func Bussiness(c1, c2 *client.Client) {
 	var destop, newCards []cards.Card
 	var buffer string
 	var tmp *client.Client
-
+	/* 给客户端建立连接的时间 */
+	time.Sleep(time.Second * 2)
 	dealCards(cards1, c1)
 	dealCards(cards2, c2)
 	fisrt, other := disideCardFirst(c1, c2)
-
+start:
 	buffer = <-fisrt.ChannelIn
 	if command.TypeSelector(buffer) != command.CARD_REQUEST {
 		return
 	}
+	if logic.ValidTest(command.CardsDeSerialize(buffer[2:])) != logic.INVALID {
+		sendOK(fisrt)
+	} else {
+		sendNOK(fisrt)
+		putCardsCommand(fisrt)
+		goto start
+	}
 
 	destop = command.CardsDeSerialize(buffer[2:])
 	tmp = other
+	tmp.ChannelOut <- command.DestopCardsSeriable(destop)
 	for {
 		putCardsCommand(tmp)
 
 		buffer = <-tmp.ChannelIn
-		if command.TypeSelector(buffer) != command.CARD_REQUEST {
-			return
-		}
-		newCards = command.CardsDeSerialize(buffer[2:])
-
-		if logic.Compare(destop, newCards) != logic.SECOND {
-			sendOK(tmp)
+		log.Println(buffer)
+		if command.TypeSelector(buffer) == command.PASS_REQUSET {
+			log.Println("passing...")
+			//sendOK(tmp)
 			if tmp == fisrt {
 				tmp = other
 			} else {
 				tmp = fisrt
 			}
+			destop = nil
+			continue
+		}
+
+		if command.TypeSelector(buffer) != command.CARD_REQUEST {
+			return
+		}
+		newCards = command.CardsDeSerialize(buffer[2:])
+
+		if logic.Compare(destop, newCards) == logic.SECOND {
+			sendOK(tmp)
+			log.Println("card is valid")
+			if tmp == fisrt {
+				tmp = other
+
+			} else {
+				tmp = fisrt
+			}
 			destop = newCards
+			tmp.ChannelOut <- command.DestopCardsSeriable(destop)
 		} else {
+			log.Println("card is invalid")
 			sendNOK(tmp)
 		}
 

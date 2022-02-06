@@ -3,6 +3,13 @@ package logic
 import "poker_server/cards"
 
 func Compare(cs1, cs2 []cards.Card) int {
+	if cs2 == nil {
+		return FIRST
+	}
+	if cs1 == nil {
+		return SECOND
+	}
+
 	cs1Type := ValidTest(cs1)
 	cs2Type := ValidTest(cs2)
 

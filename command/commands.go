@@ -3,6 +3,7 @@ package command
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"poker_server/cards"
 )
 
@@ -75,10 +76,19 @@ func DealCardsSerialize(cs []cards.Card) string {
 }
 
 func CardsDeSerialize(str string) []cards.Card {
+	log.Println("Card comming...", str)
 	var dealing Dealing
 	err := json.Unmarshal([]byte(str), &dealing)
 	if err != nil {
 		return nil
 	}
 	return dealing.Cards
+}
+
+func DestopCardsSeriable(cards []cards.Card) string {
+	dealing := Dealing{
+		Cards: cards,
+	}
+	buffer, _ := json.Marshal(dealing)
+	return commandTypeToString(DESTOP_CARD) + string(buffer)
 }

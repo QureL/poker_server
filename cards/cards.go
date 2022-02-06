@@ -44,9 +44,19 @@ func NewCardFromInt(num int) Card {
 			CardNum: Card_joker_big,
 		}
 	}
+	var cardnum int
+	var decor int
+	if num%4 == 0 {
+		cardnum = num / 4
+	} else {
+		cardnum = num/4 + 1
+	}
 
-	cardnum := num/4 + 1
-	decor := num%4 + 1
+	if num%4 == 0 {
+		decor = 4
+	} else {
+		decor = num % 4
+	}
 	return Card{
 		CardNum: cardnum,
 		Decor:   decor,

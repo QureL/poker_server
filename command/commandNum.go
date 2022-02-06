@@ -17,9 +17,16 @@ const (
 
 	COMMAND_PUT_CARD  = 8 /* 出牌指令 */
 	DEAL_CARD_COMMAND = 9 /* 服务端发牌 */
+
+	DESTOP_CARD = 10
+
+	PASS_REQUSET = 11
 )
 
 func TypeSelector(buffer string) int {
+	if len(buffer) < 2 {
+		return -1
+	}
 	commmand_type, err := strconv.Atoi(buffer[:2])
 	if err != nil {
 		return -1
