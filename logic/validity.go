@@ -16,6 +16,15 @@ const ( /* 牌组类型 */
 	INVALID       = -1
 )
 
+func getCardsNums(cs []cards.Card) []int {
+	var arr []int
+	for _, v := range cs {
+		arr = append(arr, v.CardNum)
+	}
+	sort.Ints(arr)
+	return arr
+}
+
 func ValidTest(cs []cards.Card) int {
 	cards_length := len(cs)
 	switch {
@@ -158,3 +167,13 @@ func isFourAndTwo(cs []cards.Card) bool {
 	}
 	return false
 }
+
+/*
+func isPlane(cs []cards.Card) bool {
+	if len(cs)%4 != 0 && len(cs) < 8 {
+		return false
+	}
+	var arr []int = getCardsNums(cs)
+
+}
+*/
