@@ -20,7 +20,11 @@ const (
 
 	DESTOP_CARD = 10
 
-	PASS_REQUSET = 11
+	PASS_REQUSET  = 11
+	PASS_RESPONSE = 14 /* 允许过牌 */
+
+	SUCESS_COMMAND = 12
+	FAIL_COMMAND   = 13
 )
 
 func TypeSelector(buffer string) int {

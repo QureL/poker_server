@@ -4,15 +4,14 @@ import (
 	"log"
 	"poker_server/client"
 	"poker_server/command"
+	"poker_server/network"
 	"poker_server/tools"
 
 	"github.com/gorilla/websocket"
 )
 
-var messageType int
-
-func BuildRoom(ws *websocket.Conn) {
-	buffer := getMessage(ws)
+func BuildRoomHandler(ws *websocket.Conn) {
+	buffer := network.GetMessage(ws)
 	commandType := command.TypeSelector(buffer)
 	/* client instance  */
 	var c *client.Client = nil
@@ -32,7 +31,7 @@ func BuildRoom(ws *websocket.Conn) {
 	go func() {
 		for {
 			b := <-c.ChannelOut
-			sendMessge(ws, b)
+			network.SendMessge(ws, b)
 
 			flag := false
 			select {
@@ -48,7 +47,7 @@ func BuildRoom(ws *websocket.Conn) {
 
 	go func() {
 		for {
-			b := getMessage(ws)
+			b := network.GetMessage(ws)
 			c.ChannelIn <- b
 
 			flag := false
@@ -67,8 +66,8 @@ func BuildRoom(ws *websocket.Conn) {
 	log.Println("end...")
 }
 
-func AddRoom(ws *websocket.Conn) {
-	buffer := getMessage(ws)
+func AddRoomHandler(ws *websocket.Conn) {
+	buffer := network.GetMessage(ws)
 	commandType := command.TypeSelector(buffer)
 	/* client instance  */
 	var c *client.Client = nil
@@ -92,12 +91,13 @@ func AddRoom(ws *websocket.Conn) {
 	pair := getClients(roomNum)
 	/* start bussiness goroutine */
 	go Bussiness(pair[0], pair[1])
+
 	channel <- struct{}{}
 
 	go func() {
 		for {
 			b := <-c.ChannelOut
-			sendMessge(ws, b)
+			network.SendMessge(ws, b)
 
 			flag := false
 			select {
@@ -113,7 +113,7 @@ func AddRoom(ws *websocket.Conn) {
 
 	go func() {
 		for {
-			b := getMessage(ws)
+			b := network.GetMessage(ws)
 			c.ChannelIn <- b
 
 			flag := false
@@ -137,7 +137,7 @@ func ResponseRegisterRoom(ws *websocket.Conn, room *int) *client.Client {
 	c := client.NewClient()
 	pair := [2]*client.Client{c, nil}
 	clients.Store(roomNum, pair)
-	if sendMessge(ws, string(command.RegisterRoomResponseSerialize(roomNum))) != nil {
+	if network.SendMessge(ws, string(command.RegisterRoomResponseSerialize(roomNum))) != nil {
 		return nil
 	} else {
 		*room = roomNum
@@ -152,14 +152,14 @@ func ResponseAddRoom(ws *websocket.Conn, str string, outRomm *int) *client.Clien
 		pair, _ := obj.([2]*client.Client)
 		pair[1] = client.NewClient()
 		clients.Store(roomNum, pair)
-		if sendMessge(ws, command.ResponseSerialize(command.RESULT_OK, command.ADD_ROOM_RESPONSE)) != nil {
+		if network.SendMessge(ws, command.ResponseSerialize(command.RESULT_OK, command.ADD_ROOM_RESPONSE)) != nil {
 			return nil
 		} else {
 			*outRomm = roomNum
 			return pair[1]
 		}
 	} else {
-		sendMessge(ws, command.ResponseSerialize(command.RESULT_NOK, command.ADD_ROOM_RESPONSE))
+		network.SendMessge(ws, command.ResponseSerialize(command.RESULT_NOK, command.ADD_ROOM_RESPONSE))
 		return nil
 	}
 }

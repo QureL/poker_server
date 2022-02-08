@@ -20,7 +20,7 @@ func buildroom(c *gin.Context) {
 		return
 	}
 	defer ws.Close()
-	statemachine.BuildRoom(ws)
+	statemachine.BuildRoomHandler(ws)
 }
 
 func addroom(c *gin.Context) {
@@ -29,7 +29,7 @@ func addroom(c *gin.Context) {
 		return
 	}
 	defer ws.Close()
-	statemachine.AddRoom(ws)
+	statemachine.AddRoomHandler(ws)
 }
 
 func Run() {

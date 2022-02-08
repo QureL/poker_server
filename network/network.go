@@ -1,8 +1,10 @@
-package statemachine
+package network
 
 import "github.com/gorilla/websocket"
 
-func getMessage(ws *websocket.Conn) string {
+var messageType int
+
+func GetMessage(ws *websocket.Conn) string {
 	mt, message, err := ws.ReadMessage()
 	if err != nil {
 		return ""
@@ -11,7 +13,7 @@ func getMessage(ws *websocket.Conn) string {
 	return string(message)
 }
 
-func sendMessge(ws *websocket.Conn, buffer string) error {
+func SendMessge(ws *websocket.Conn, buffer string) error {
 	return ws.WriteMessage(messageType, []byte(buffer))
 
 }

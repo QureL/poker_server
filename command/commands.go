@@ -92,3 +92,7 @@ func DestopCardsSeriable(cards []cards.Card) string {
 	buffer, _ := json.Marshal(dealing)
 	return commandTypeToString(DESTOP_CARD) + string(buffer)
 }
+
+func SuccessCommandSerialize() string {
+	return commandTypeToString(SUCESS_COMMAND)
+}

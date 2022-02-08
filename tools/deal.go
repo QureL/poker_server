@@ -9,28 +9,6 @@ func init() {
 	rand.Seed(time.Now().Unix())
 }
 
-/*
-
-func GenerateDiscard() []int {
-	var result []int
-
-	for len(result) < cards.DISCARD_NUM {
-		i := rand.Intn(cards.DECK_SIZE)
-		flag := true
-		for _, tmp := range result {
-			if tmp == i {
-				flag = false
-				break
-			}
-		}
-		if flag {
-			result = append(result, i+1)
-		}
-	}
-	return result
-}
-*/
-
 /** Returns a random shuffling of the array. */
 func Shuffle(nums []int) []int {
 	len := len(nums)
