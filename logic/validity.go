@@ -168,7 +168,6 @@ func isFourAndTwo(cs []cards.Card) bool {
 	return false
 }
 
-/*
 func isPlane(cs []cards.Card) bool {
 	if len(cs)%4 != 0 && len(cs) < 8 {
 		return false
@@ -176,4 +175,3 @@ func isPlane(cs []cards.Card) bool {
 	var arr []int = getCardsNums(cs)
 
 }
-*/
