@@ -188,7 +188,6 @@ start:
 					state = cards_invalid
 					log.Println("card are invalid")
 				}
-
 			} else if command.TypeSelector(buffer) == command.PASS_REQUSET {
 				/* 防止反复pass */
 				if cards_in_desktop == nil {

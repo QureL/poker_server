@@ -27,20 +27,16 @@ func BuildRoomHandler(ws *websocket.Conn) {
 	stopChannel := storeStopChannel(roomNum)
 
 	<-startChannel
+	rmStartChannel(roomNum)
 
 	go func() {
 		for {
 			b := <-c.ChannelOut
 			network.SendMessge(ws, b)
-
-			flag := false
 			select {
 			case <-stopChannel:
-				flag = true
+				return
 			default:
-			}
-			if flag {
-				break
 			}
 		}
 	}()
@@ -49,15 +45,10 @@ func BuildRoomHandler(ws *websocket.Conn) {
 		for {
 			b := network.GetMessage(ws)
 			c.ChannelIn <- b
-
-			flag := false
 			select {
 			case <-stopChannel:
-				flag = true
+				return
 			default:
-			}
-			if flag {
-				break
 			}
 		}
 	}()
@@ -80,8 +71,8 @@ func AddRoomHandler(ws *websocket.Conn) {
 		return
 	}
 
-	channel := getStartChannel(roomNum)
-	if channel == nil {
+	startChannel := getStartChannel(roomNum)
+	if startChannel == nil {
 		return
 	}
 	stopChannel := getStopChannel(roomNum)
@@ -92,21 +83,16 @@ func AddRoomHandler(ws *websocket.Conn) {
 	/* start bussiness goroutine */
 	go Bussiness(pair[0], pair[1])
 
-	channel <- struct{}{}
+	close(startChannel)
 
 	go func() {
 		for {
 			b := <-c.ChannelOut
 			network.SendMessge(ws, b)
-
-			flag := false
 			select {
 			case <-stopChannel:
-				flag = true
+				return
 			default:
-			}
-			if flag {
-				break
 			}
 		}
 	}()
@@ -115,15 +101,10 @@ func AddRoomHandler(ws *websocket.Conn) {
 		for {
 			b := network.GetMessage(ws)
 			c.ChannelIn <- b
-
-			flag := false
 			select {
 			case <-stopChannel:
-				flag = true
+				return
 			default:
-			}
-			if flag {
-				break
 			}
 		}
 	}()

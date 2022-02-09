@@ -13,6 +13,10 @@ func getClients(room int) [2]*client.Client {
 	return pair
 }
 
+func rmClients(room int) {
+	clients.Delete(room)
+}
+
 var startChannel sync.Map
 
 func storeStartChannel(room int) chan struct{} {
@@ -30,6 +34,10 @@ func getStartChannel(room int) chan struct{} {
 	return channel
 }
 
+func rmStartChannel(room int) {
+	startChannel.Delete(room)
+}
+
 var stopChannel sync.Map
 
 func storeStopChannel(room int) chan struct{} {
@@ -45,4 +53,8 @@ func getStopChannel(room int) chan struct{} {
 	}
 	channel, _ := obj.(chan struct{})
 	return channel
+}
+
+func rmStopChannel(room int) {
+	startChannel.Delete(room)
 }

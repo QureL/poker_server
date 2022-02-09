@@ -172,6 +172,15 @@ func isPlane(cs []cards.Card) bool {
 	if len(cs)%4 != 0 && len(cs) < 8 {
 		return false
 	}
-	var arr []int = getCardsNums(cs)
+	arr := getCardsNums(cs)
+
+	var pattern []int
+	for i := 0; i < len(cs)/4*3; i++ {
+		pattern = append(pattern, i/3)
+	}
+
+	for _, v := range arr {
+
+	}
 
 }
