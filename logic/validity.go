@@ -13,6 +13,8 @@ const ( /* 牌组类型 */
 	THREE_AND_ONE = 5
 	DRAGON        = 6
 	FOUR_AND_TWO  = 7
+	PLANE         = 8
+	LIANDUI       = 9
 	INVALID       = -1
 )
 
@@ -61,6 +63,10 @@ func ValidTest(cs []cards.Card) int {
 			return FOUR_AND_TWO
 		} else if isDragon(cs) {
 			return DRAGON
+		} else if isPlane(cs, nil) {
+			return PLANE
+		} else if isLiandui(cs, nil) {
+			return LIANDUI
 		} else {
 			return INVALID
 		}
@@ -82,10 +88,7 @@ func isBomb(cs []cards.Card) bool {
 }
 
 func isSingle(cs []cards.Card) bool {
-	if len(cs) == 1 {
-		return true
-	}
-	return false
+	return len(cs) == 1
 }
 
 func isPire(cs []cards.Card) bool {
@@ -168,19 +171,79 @@ func isFourAndTwo(cs []cards.Card) bool {
 	return false
 }
 
-func isPlane(cs []cards.Card) bool {
+func isPlane(cs []cards.Card, bigest *int) bool {
 	if len(cs)%4 != 0 && len(cs) < 8 {
 		return false
 	}
 	arr := getCardsNums(cs)
 
-	var pattern []int
-	for i := 0; i < len(cs)/4*3; i++ {
-		pattern = append(pattern, i/3)
-	}
+	m_cards := make(map[int]int)
 
 	for _, v := range arr {
+		m_cards[v] += 1
+	}
+	cnt := 0
 
+	var card_three []int
+	for i, v := range m_cards {
+		if v >= 3 {
+			card_three = append(card_three, i)
+			cnt++
+		}
+	}
+	if cnt != len(cs)/4 {
+		return false
 	}
 
+	sort.Ints(card_three)
+
+	for i := 1; i < len(card_three); i++ {
+		if card_three[i]-card_three[i-1] != 1 {
+			return false
+		}
+	}
+
+	if card_three[len(card_three)-1] >= cards.Card_2 {
+		return false
+	}
+
+	if bigest != nil {
+		*bigest = card_three[len(card_three)-1]
+	}
+	return true
+}
+
+func isLiandui(cs []cards.Card, bigest *int) bool {
+	if len(cs) < 6 || len(cs)%2 != 0 {
+		return false
+	}
+	arr := getCardsNums(cs)
+
+	m_cards := make(map[int]int)
+
+	for _, v := range arr {
+		m_cards[v] += 1
+	}
+
+	var tmp []int
+
+	for i, v := range m_cards {
+		if v != 2 {
+			return false
+		}
+		tmp = append(tmp, i)
+	}
+
+	sort.Ints(tmp)
+
+	for i := 1; i < len(tmp); i++ {
+		if tmp[i]-tmp[i-1] != 1 {
+			return false
+		}
+	}
+
+	if bigest != nil {
+		*bigest = tmp[len(tmp)-1]
+	}
+	return true
 }
