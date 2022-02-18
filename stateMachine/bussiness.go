@@ -116,7 +116,15 @@ func sendPassResponseNOK(c *client.Client) {
 	c.ChannelOut <- command.ResponseSerialize(command.RESULT_NOK, command.PASS_RESPONSE)
 }
 
-func Bussiness2(c1, c2 *client.Client) {
+func sendSuccessResponse(c *client.Client) {
+	c.ChannelOut <- command.SuccessResponseSerialize()
+}
+
+func sendFailResponse(c *client.Client) {
+	c.ChannelOut <- command.FailResponseSerialize()
+}
+
+func Bussiness2(c1, c2 *client.Client, stopChannel chan struct{}) {
 	cards1, cards2 := cards.GenerateCard()
 
 	var cards_in_desktop, cards_new []cards.Card
@@ -162,6 +170,7 @@ start:
 		get_cards     uint8 = 1
 		cards_invalid uint8 = 2
 		cards_valid   uint8 = 3
+		end           uint8 = 4
 	)
 	var state uint8 = idle
 	var illegal_count int = 0
@@ -199,6 +208,8 @@ start:
 					cards_in_desktop = nil
 				}
 				state = idle
+			} else if command.TypeSelector(buffer) == command.SUCCESS_REQUEST {
+				state = end
 			} else {
 				log.Println("illegal request")
 				illegal_count++
@@ -215,7 +226,16 @@ start:
 			other.ChannelOut <- command.DestopCardsSeriable(cards_in_desktop)
 			exchangeClient(&tmp)
 			state = idle
+		case end:
+			sendSuccessResponse(tmp)
+			other := getOtherClient(tmp)
+			sendFailResponse(other)
+			/* game end... */
+			close((stopChannel))
+			return
+
 		}
+
 	}
 
 }

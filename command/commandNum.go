@@ -25,6 +25,8 @@ const (
 
 	SUCESS_COMMAND = 12
 	FAIL_COMMAND   = 13
+
+	SUCCESS_REQUEST = 14
 )
 
 func TypeSelector(buffer string) int {

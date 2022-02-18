@@ -93,6 +93,10 @@ func DestopCardsSeriable(cards []cards.Card) string {
 	return commandTypeToString(DESTOP_CARD) + string(buffer)
 }
 
-func SuccessCommandSerialize() string {
-	return commandTypeToString(SUCESS_COMMAND)
+func SuccessResponseSerialize() string {
+	return commandTypeToString(SUCCESS_RESPONSE)
+}
+
+func FailResponseSerialize() string {
+	return commandTypeToString(FAIL_RESPONSE)
 }
