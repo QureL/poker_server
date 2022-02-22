@@ -139,3 +139,71 @@ func DragonCompare(cs1, cs2 []cards.Card) int {
 		return INCOMPARABLE
 	}
 }
+
+func PlaneCompare(cs1, cs2 []cards.Card) int {
+	if len(cs1) != len(cs2) {
+		return INCOMPARABLE
+	}
+
+	arr := getCardsNums(cs1)
+
+	m_cards := make(map[int]int)
+
+	for _, v := range arr {
+		m_cards[v] += 1
+	}
+	bigest_arr1 := 0
+	for k, v := range m_cards {
+		if v == 3 && k > bigest_arr1 {
+			bigest_arr1 = k
+		}
+	}
+
+	arr = getCardsNums(cs1)
+	for k := range m_cards {
+		delete(m_cards, k)
+	}
+
+	for _, v := range arr {
+		m_cards[v] += 1
+	}
+
+	bigest_arr2 := 0
+	for k, v := range m_cards {
+		if v == 3 && k > bigest_arr2 {
+			bigest_arr2 = k
+		}
+	}
+
+	if bigest_arr1 > bigest_arr2 {
+		return FIRST
+	} else if bigest_arr1 < bigest_arr2 {
+		return SECOND
+	} else {
+		return INCOMPARABLE
+	}
+
+}
+
+func LianduiCompare(cs1, cs2 []cards.Card) int {
+	if len(cs1) != len(cs2) {
+		return INCOMPARABLE
+	}
+
+	arr1 := getCardsNums(cs1)
+	arr2 := getCardsNums(cs2)
+
+	sort.Ints(arr1)
+	sort.Ints(arr2)
+
+	bigest_arr1 := arr1[len(arr1)-1]
+	bigest_arr2 := arr2[len(arr2)-1]
+
+	if bigest_arr1 > bigest_arr2 {
+		return FIRST
+	} else if bigest_arr1 < bigest_arr2 {
+		return SECOND
+	} else {
+		return INCOMPARABLE
+	}
+}

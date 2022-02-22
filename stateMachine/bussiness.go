@@ -10,76 +10,6 @@ import (
 	"time"
 )
 
-func Bussiness(c1, c2 *client.Client) {
-	cards1, cards2 := cards.GenerateCard()
-
-	var destop, newCards []cards.Card
-	var buffer string
-	var tmp *client.Client
-	/* 给客户端建立连接的时间 */
-	time.Sleep(time.Second * 2)
-	dealCards(cards1, c1)
-	dealCards(cards2, c2)
-	fisrt, other := disideCardFirst(c1, c2)
-
-start:
-	buffer = <-fisrt.ChannelIn
-	if command.TypeSelector(buffer) != command.CARD_REQUEST {
-		return
-	}
-	if logic.ValidTest(command.CardsDeSerialize(buffer[2:])) != logic.INVALID {
-		sendCardResponseOK(fisrt)
-	} else {
-		sendCardResponseNOK(fisrt)
-		putCardsCommand(fisrt)
-		goto start
-	}
-
-	destop = command.CardsDeSerialize(buffer[2:])
-	tmp = other
-	tmp.ChannelOut <- command.DestopCardsSeriable(destop)
-	for {
-		putCardsCommand(tmp)
-
-		buffer = <-tmp.ChannelIn
-		log.Println(buffer)
-		if command.TypeSelector(buffer) == command.PASS_REQUSET {
-			log.Println("passing...")
-			//sendCardResponseOK(tmp)
-			if tmp == fisrt {
-				tmp = other
-			} else {
-				tmp = fisrt
-			}
-			destop = nil
-			continue
-		}
-
-		if command.TypeSelector(buffer) != command.CARD_REQUEST {
-			return
-		}
-		newCards = command.CardsDeSerialize(buffer[2:])
-
-		if logic.Compare(destop, newCards) == logic.SECOND {
-			sendCardResponseOK(tmp)
-			log.Println("card is valid")
-			if tmp == fisrt {
-				tmp = other
-
-			} else {
-				tmp = fisrt
-			}
-			destop = newCards
-			tmp.ChannelOut <- command.DestopCardsSeriable(destop)
-		} else {
-			log.Println("card is invalid")
-			sendCardResponseNOK(tmp)
-		}
-
-	}
-
-}
-
 func disideCardFirst(c1, c2 *client.Client) (*client.Client, *client.Client) {
 	i := rand.Intn(2)
 	if i == 0 {
@@ -124,7 +54,7 @@ func sendFailResponse(c *client.Client) {
 	c.ChannelOut <- command.FailResponseSerialize()
 }
 
-func Bussiness2(c1, c2 *client.Client, stopChannel chan struct{}) {
+func Bussiness(c1, c2 *client.Client, stopChannel chan struct{}) {
 	cards1, cards2 := cards.GenerateCard()
 
 	var cards_in_desktop, cards_new []cards.Card
@@ -187,6 +117,7 @@ start:
 			buffer = <-tmp.ChannelIn
 			if command.TypeSelector(buffer) == command.CARD_REQUEST {
 				cards_new = command.CardsDeSerialize(buffer[2:])
+				log.Println("logic.Compare(cards_in_desktop, cards_new) ", logic.Compare(cards_in_desktop, cards_new))
 				if logic.Compare(cards_in_desktop, cards_new) == logic.SECOND {
 					sendCardResponseOK(tmp)
 					cards_in_desktop = cards_new
@@ -227,11 +158,13 @@ start:
 			exchangeClient(&tmp)
 			state = idle
 		case end:
+			log.Println("game end...")
 			sendSuccessResponse(tmp)
 			other := getOtherClient(tmp)
 			sendFailResponse(other)
 			/* game end... */
-			close((stopChannel))
+			time.Sleep(time.Second)
+			close(stopChannel)
 			return
 
 		}

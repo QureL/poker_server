@@ -82,6 +82,7 @@ func CardsDeSerialize(str string) []cards.Card {
 	if err != nil {
 		return nil
 	}
+	log.Println("dealing.Cards", dealing.Cards)
 	return dealing.Cards
 }
 

@@ -6,6 +6,7 @@ import (
 	"poker_server/command"
 	"poker_server/network"
 	"poker_server/tools"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -81,7 +82,7 @@ func AddRoomHandler(ws *websocket.Conn) {
 	}
 	pair := getClients(roomNum)
 	/* start bussiness goroutine */
-	go Bussiness(pair[0], pair[1])
+	go Bussiness(pair[0], pair[1], stopChannel)
 
 	close(startChannel)
 
@@ -110,6 +111,8 @@ func AddRoomHandler(ws *websocket.Conn) {
 	}()
 
 	<-stopChannel
+	rmStopChannel(roomNum)
+	rmClients(roomNum)
 	log.Println("end...")
 }
 
@@ -118,6 +121,7 @@ func ResponseRegisterRoom(ws *websocket.Conn, room *int) *client.Client {
 	c := client.NewClient()
 	pair := [2]*client.Client{c, nil}
 	clients.Store(roomNum, pair)
+	time.Sleep(time.Second)
 	if network.SendMessge(ws, string(command.RegisterRoomResponseSerialize(roomNum))) != nil {
 		return nil
 	} else {
@@ -129,6 +133,7 @@ func ResponseRegisterRoom(ws *websocket.Conn, room *int) *client.Client {
 func ResponseAddRoom(ws *websocket.Conn, str string, outRomm *int) *client.Client {
 	roomNum := command.AddRoomRequestDeSerialize(str)
 	obj, ok := clients.Load(roomNum)
+	time.Sleep(time.Second)
 	if ok {
 		pair, _ := obj.([2]*client.Client)
 		pair[1] = client.NewClient()

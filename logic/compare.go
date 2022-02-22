@@ -4,10 +4,18 @@ import "poker_server/cards"
 
 func Compare(cs1, cs2 []cards.Card) int {
 	if cs2 == nil {
-		return FIRST
+		if ValidTest(cs1) != INVALID {
+			return FIRST
+		} else {
+			return INCOMPARABLE
+		}
 	}
 	if cs1 == nil {
-		return SECOND
+		if ValidTest(cs2) != INVALID {
+			return SECOND
+		} else {
+			return INCOMPARABLE
+		}
 	}
 
 	cs1Type := ValidTest(cs1)
@@ -38,6 +46,10 @@ func Compare(cs1, cs2 []cards.Card) int {
 		f = BombCompare
 	case DRAGON:
 		f = DragonCompare
+	case PLANE:
+		f = PireCompare
+	case LIANDUI:
+		f = LianduiCompare
 	default:
 		return INCOMPARABLE
 	}

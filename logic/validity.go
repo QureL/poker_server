@@ -19,7 +19,7 @@ const ( /* 牌组类型 */
 )
 
 func getCardsNums(cs []cards.Card) []int {
-	var arr []int
+	var arr []int = make([]int, 0, len(cs))
 	for _, v := range cs {
 		arr = append(arr, v.CardNum)
 	}
@@ -76,8 +76,10 @@ func ValidTest(cs []cards.Card) int {
 
 func isBomb(cs []cards.Card) bool {
 	if len(cs) == 4 {
-		tmp := cs[0]
-		for _, i := range cs {
+		arr := getCardsNums(cs)
+		tmp := arr[0]
+
+		for _, i := range arr {
 			if i != tmp {
 				return false
 			}
@@ -92,20 +94,24 @@ func isSingle(cs []cards.Card) bool {
 }
 
 func isPire(cs []cards.Card) bool {
-	if len(cs) == 2 {
-		if cs[0] == cs[1] {
-			return true
-		}
+	if len(cs) != 2 {
+		return false
 	}
-	return false
+	arr := getCardsNums(cs)
+	if arr[0] == arr[1] {
+		return true
+	} else {
+		return false
+	}
 }
 
 func isTriplet(cs []cards.Card) bool {
 	if len(cs) != 3 {
 		return false
 	}
-	tmp := cs[0]
-	for _, i := range cs {
+	arr := getCardsNums(cs)
+	tmp := arr[0]
+	for _, i := range arr {
 		if i != tmp {
 			return false
 		}
@@ -117,11 +123,7 @@ func isThreeAndOne(cs []cards.Card) bool {
 	if len(cs) != 4 {
 		return false
 	}
-	var arr []int
-	for _, v := range cs {
-		arr = append(arr, v.CardNum)
-	}
-	sort.Ints(arr)
+	var arr []int = getCardsNums(cs)
 	if arr[0] == arr[1] && arr[1] == arr[2] && arr[1] != arr[3] {
 		return true
 	}
@@ -135,11 +137,7 @@ func isDragon(cs []cards.Card) bool {
 	if len(cs) < 5 {
 		return false
 	}
-	var arrInt []int
-	for _, value := range cs {
-		arrInt = append(arrInt, value.CardNum)
-	}
-	sort.Ints(arrInt)
+	var arrInt []int = getCardsNums(cs)
 	if arrInt[len(arrInt)-1] >= cards.Card_a {
 		return false
 	}
