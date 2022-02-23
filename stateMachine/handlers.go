@@ -4,6 +4,7 @@ import (
 	"log"
 	"poker_server/client"
 	"poker_server/command"
+	"poker_server/config"
 	"poker_server/network"
 	"poker_server/tools"
 	"time"
@@ -26,9 +27,16 @@ func BuildRoomHandler(ws *websocket.Conn) {
 
 	startChannel := storeStartChannel(roomNum)
 	stopChannel := storeStopChannel(roomNum)
+	defer rmStartChannel(roomNum)
 
-	<-startChannel
-	rmStartChannel(roomNum)
+	timer := time.NewTimer(time.Second * config.REGISTER_ROOM_WAIT_TIME)
+
+	select {
+	case <-startChannel:
+	case <-timer.C:
+		log.Println("超时....")
+		return
+	}
 
 	go func() {
 		for {

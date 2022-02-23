@@ -9,7 +9,7 @@ func init() {
 	rand.Seed(time.Now().Unix())
 }
 
-/** Returns a random shuffling of the array. */
+/** Knuth-Durstenfeld */
 func Shuffle(nums []int) []int {
 	len := len(nums)
 	cur := make([]int, len)
